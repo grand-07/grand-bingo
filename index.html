@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo Pro - Updated Login</title>
+    <title>Bingo Pro - No Delay Edition</title>
     <style>
         :root {
             --bg-deep: #0f172a;
@@ -40,16 +40,7 @@
             max-width: 280px;
         }
 
-        .login-box h2 { margin-bottom: 5px; }
-
-        /* New Red Note Style */
-        .name-format-note {
-            color: var(--danger);
-            font-size: 11px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            display: block;
-        }
+        .name-format-note { color: var(--danger); font-size: 11px; font-weight: bold; margin-bottom: 15px; display: block; }
 
         .login-box input {
             background: var(--bg-deep);
@@ -76,7 +67,6 @@
             text-align: center;
             padding: 20px;
         }
-
         #win-overlay.show { display: flex; }
 
         .dashboard {
@@ -88,33 +78,51 @@
             max-width: 400px;
             border: 1px solid rgba(255,255,255,0.1);
             position: relative;
+            overflow: hidden;
         }
 
         .dev-container { position: absolute; top: 10px; left: 10px; z-index: 20; display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 15px; }
-
         #live-clock { position: absolute; top: 10px; right: 10px; color: var(--accent); font-size: 14px; font-family: monospace; font-weight: bold; }
 
         .sidebar { padding: 35px 20px 10px; text-align: center; }
-
         #number-display { font-size: 55px; font-weight: 800; margin: 5px 0; color: white; }
 
-        .main-content { padding: 15px; background: var(--bg-deep); border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+        .called-list-container {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: left;
+        }
+        .called-list-title { font-size: 10px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 5px; display: block; }
+        #called-numbers-history {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 5px;
+            scrollbar-width: thin;
+        }
+        .history-item {
+            background: var(--cell-bg);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--accent);
+        }
 
-        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .main-content { padding: 15px; background: var(--bg-deep); }
 
-        .cell { aspect-ratio: 1/1; background: var(--cell-bg); display: flex; align-items: center; justify-content: center; font-weight: 700; border-radius: 6px; font-size: 14px; }
-
+        /* 4x4 Grid */
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .cell { aspect-ratio: 1/1; background: var(--cell-bg); display: flex; align-items: center; justify-content: center; font-weight: 700; border-radius: 6px; font-size: 16px; }
         .cell.selected { background: var(--accent); color: var(--bg-deep); box-shadow: 0 0 10px var(--accent); }
 
         .btn { padding: 12px; background: var(--accent); color: var(--bg-deep); border: none; border-radius: 8px; font-weight: 700; width: 100%; margin-bottom: 8px; cursor: pointer; text-transform: uppercase; }
-
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
         .btn-reset { background: transparent; color: var(--danger); border: 1px solid var(--danger); font-size: 11px; }
-
         #cooldown-text { color: var(--danger); font-weight: bold; margin-top: 15px; font-size: 18px; }
 
-        /* Switch */
         .switch { position: relative; display: inline-block; width: 30px; height: 16px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #475569; border-radius: 34px; transition: .3s; }
@@ -138,7 +146,6 @@
         <h1 style="color: var(--success); font-size: 35px; margin-bottom: 5px;">CONGRATULATIONS!</h1>
         <h2 id="win-player-name" style="color: white; margin: 0;">PLAYER</h2>
         <div id="win-time" style="font-size: 20px; color: var(--accent); font-family: monospace; margin: 15px 0;">Time: 00:00</div>
-        <p style="color: var(--text-dim);">System Locked for Fair Play</p>
         <div id="cooldown-text">Wait: 10:00</div>
         <button id="play-again-btn" class="btn" style="max-width: 200px; margin-top: 15px;" onclick="location.reload()" disabled>PLAY AGAIN</button>
     </div>
@@ -158,6 +165,13 @@
             <div id="number-display">--</div>
             <button id="draw-btn" class="btn" onclick="drawNumber()">DRAW NUMBER</button>
             <button class="btn btn-reset" onclick="location.reload()">RESET</button>
+        </div>
+
+        <div class="called-list-container">
+            <span class="called-list-title">Called Numbers:</span>
+            <div id="called-numbers-history">
+                <span style="color: #475569; font-size: 12px;">No numbers called yet</span>
+            </div>
         </div>
 
         <div class="main-content">
@@ -186,19 +200,19 @@
         function generateCard() {
             const container = document.getElementById('bingo-card');
             container.innerHTML = '';
-            let nums = Array.from({length: 75}, (_, i) => i + 1).sort(() => Math.random() - 0.5);
-            for (let i = 0; i < 25; i++) {
+            // Range 1-60
+            let nums = Array.from({length: 60}, (_, i) => i + 1).sort(() => Math.random() - 0.5);
+            for (let i = 0; i < 16; i++) {
                 let cell = document.createElement('div');
                 cell.className = 'cell';
-                let val = (i === 12) ? "FREE" : nums[i];
+                let val = nums[i];
                 cell.innerText = val;
-                if (val === "FREE") cell.classList.add('selected');
                 cell.onclick = () => {
-                    if (isLocked || val === "FREE") return;
+                    if (isLocked) return;
                     startTimer();
                     if (document.getElementById('dev-mode-toggle').checked || calledNumbers.includes(Number(val))) {
                         cell.classList.toggle('selected');
-                        if (document.querySelectorAll('.cell.selected').length === 25) win();
+                        if (document.querySelectorAll('.cell.selected').length === 16) win();
                     }
                 };
                 container.appendChild(cell);
@@ -219,12 +233,25 @@
         function drawNumber() {
             if (isLocked) return;
             startTimer();
-            if (calledNumbers.length >= 75) return;
-            let n; do { n = Math.floor(Math.random()*75)+1; } while(calledNumbers.includes(n));
+            if (calledNumbers.length >= 60) return;
+            let n; do { n = Math.floor(Math.random()*60)+1; } while(calledNumbers.includes(n));
             calledNumbers.push(n);
+
             document.getElementById('number-display').innerText = n;
-            document.getElementById('draw-btn').disabled = true;
-            setTimeout(() => document.getElementById('draw-btn').disabled = false, 2500);
+            updateHistoryUI();
+
+            // Timer removed from here
+        }
+
+        function updateHistoryUI() {
+            const historyBox = document.getElementById('called-numbers-history');
+            historyBox.innerHTML = '';
+            [...calledNumbers].reverse().forEach(num => {
+                let span = document.createElement('span');
+                span.className = 'history-item';
+                span.innerText = num;
+                historyBox.appendChild(span);
+            });
         }
 
         function startCooldown() {
@@ -249,11 +276,7 @@
             document.getElementById('win-time').innerText = "Final Time: " + finalTime;
             document.getElementById('win-overlay').classList.add('show');
             startCooldown();
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ name: playerName, playtime: finalTime, seconds: totalSecondsPlayed })
-            });
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: playerName, playtime: finalTime, seconds: totalSecondsPlayed }) });
         }
     </script>
 </body>
