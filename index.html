@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo Pro - Responsive</title>
+    <title>Bingo Pro - Updated Login</title>
     <style>
         :root {
             --bg-deep: #0f172a;
@@ -38,6 +38,17 @@
             text-align: center;
             width: 100%;
             max-width: 280px;
+        }
+
+        .login-box h2 { margin-bottom: 5px; }
+
+        /* New Red Note Style */
+        .name-format-note {
+            color: var(--danger);
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: block;
         }
 
         .login-box input {
@@ -97,7 +108,11 @@
 
         .btn { padding: 12px; background: var(--accent); color: var(--bg-deep); border: none; border-radius: 8px; font-weight: 700; width: 100%; margin-bottom: 8px; cursor: pointer; text-transform: uppercase; }
 
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
         .btn-reset { background: transparent; color: var(--danger); border: 1px solid var(--danger); font-size: 11px; }
+
+        #cooldown-text { color: var(--danger); font-weight: bold; margin-top: 15px; font-size: 18px; }
 
         /* Switch */
         .switch { position: relative; display: inline-block; width: 30px; height: 16px; }
@@ -113,6 +128,7 @@
     <div id="login-screen">
         <div class="login-box">
             <h2>BINGO JOIN</h2>
+            <span class="name-format-note">Name format : Nick Wildee</span>
             <input type="text" id="player-name-input" placeholder="Your Name">
             <button class="btn" onclick="startGame()">ENTER GAME</button>
         </div>
@@ -121,9 +137,10 @@
     <div id="win-overlay">
         <h1 style="color: var(--success); font-size: 35px; margin-bottom: 5px;">CONGRATULATIONS!</h1>
         <h2 id="win-player-name" style="color: white; margin: 0;">PLAYER</h2>
-        <p style="color: var(--text-dim); margin-top: 10px;">You hit BINGO!</p>
         <div id="win-time" style="font-size: 20px; color: var(--accent); font-family: monospace; margin: 15px 0;">Time: 00:00</div>
-        <button class="btn" style="max-width: 200px;" onclick="location.reload()">PLAY AGAIN</button>
+        <p style="color: var(--text-dim);">System Locked for Fair Play</p>
+        <div id="cooldown-text">Wait: 10:00</div>
+        <button id="play-again-btn" class="btn" style="max-width: 200px; margin-top: 15px;" onclick="location.reload()" disabled>PLAY AGAIN</button>
     </div>
 
     <div class="dashboard">
@@ -210,17 +227,28 @@
             setTimeout(() => document.getElementById('draw-btn').disabled = false, 2500);
         }
 
+        function startCooldown() {
+            let timeLeft = 600;
+            const timer = setInterval(() => {
+                let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+                document.getElementById('cooldown-text').innerText = `Wait: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('cooldown-text').innerText = "System Ready!";
+                    document.getElementById('play-again-btn').disabled = false;
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
         function win() {
             isLocked = true;
             clearInterval(stopwatchInterval);
             const finalTime = document.getElementById('live-clock').innerText;
-
-            // Show Win Note
             document.getElementById('win-player-name').innerText = playerName.toUpperCase();
             document.getElementById('win-time').innerText = "Final Time: " + finalTime;
             document.getElementById('win-overlay').classList.add('show');
-
-            // Sync to Sheet
+            startCooldown();
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
