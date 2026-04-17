@@ -3,48 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo Pro - Secure Noir Edition</title>
+    <title>Bingo Pro - Mobile Optimized</title>
     <style>
-        /* Aguer shob CSS style ekhane thakbe... (Style block omitted for brevity) */
-        :root { --bg-deep: #0f172a; --bg-card: #1e293b; --accent: #38bdf8; --accent-glow: rgba(56, 189, 248, 0.4); --text-main: #f8fafc; --text-dim: #94a3b8; --success: #22c55e; --success-glow: rgba(34, 197, 94, 0.4); --danger: #f43f5e; --cell-bg: #334155; --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-deep); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-deep); z-index: 1000; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: var(--bg-card); padding: 40px; border-radius: 20px; border: 1px solid var(--accent); text-align: center; box-shadow: 0 0 30px var(--accent-glow); }
-        .login-box input { background: var(--bg-deep); border: 1px solid var(--text-dim); padding: 12px; color: white; border-radius: 8px; margin-bottom: 20px; width: 220px; display: block; outline: none; }
-        .dashboard { display: flex; flex-direction: row; background: var(--bg-card); border-radius: 24px; max-width: 1100px; width: 100%; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; }
-        .dev-container { position: absolute; top: 20px; left: 20px; display: flex; align-items: center; gap: 10px; z-index: 20; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 20px; }
+        :root {
+            --bg-deep: #0f172a;
+            --bg-card: #1e293b;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.4);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #22c55e;
+            --danger: #f43f5e;
+            --cell-bg: #334155;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-deep);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--accent);
+            text-align: center;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .login-box input {
+            background: var(--bg-deep);
+            border: 1px solid var(--text-dim);
+            padding: 12px;
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .dashboard {
+            display: flex;
+            flex-direction: row; /* Desktop layout */
+            background: var(--bg-card);
+            border-radius: 24px;
+            max-width: 1000px;
+            width: 95%;
+            margin: 20px auto;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        /* Mobile specific layout change */
+        @media (max-width: 768px) {
+            .dashboard {
+                flex-direction: column; /* Mobile-e ekta arektar niche ashbe */
+                height: auto;
+                margin: 10px auto;
+            }
+            .sidebar {
+                border-right: none !important;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                padding: 20px !important;
+            }
+            .main-content {
+                padding: 20px !important;
+            }
+            #number-display {
+                font-size: 60px !important;
+            }
+            .cell {
+                width: 100% !important;
+                height: 55px !important;
+            }
+        }
+
+        .dev-container {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 20;
+            background: rgba(0,0,0,0.3);
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
         .dev-label { font-size: 10px; font-weight: bold; color: var(--text-dim); }
+
         .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #475569; transition: .4s; border-radius: 34px; }
         .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--danger); }
         input:checked + .slider:before { transform: translateX(16px); }
-        #live-clock { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 8px; color: var(--accent); font-family: monospace; font-size: 14px; }
-        #win-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); z-index: 100; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        #win-overlay.show { display: flex; }
-        .sidebar { flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(15, 23, 42, 0.5); padding: 40px; border-right: 1px solid rgba(255,255,255,0.05); }
-        #number-display { font-size: clamp(80px, 10vw, 120px); font-weight: 900; color: var(--text-main); margin: 10px 0; }
-        #timer-text { font-size: 11px; color: var(--accent); font-weight: bold; }
-        .history-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-top: 20px; }
-        #history { font-size: 12px; color: var(--text-dim); max-height: 60px; overflow-y: auto; word-break: break-all; }
-        .main-content { flex: 1.5; display: flex; flex-direction: column; align-items: center; padding: 40px; background: var(--bg-deep); }
-        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        .cell { width: 65px; height: 65px; background: var(--cell-bg); display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: pointer; border-radius: 10px; color: var(--text-main); transition: var(--transition); border: 1px solid rgba(255,255,255,0.05); }
-        .cell.selected { background: var(--accent); color: var(--bg-deep); box-shadow: 0 0 10px var(--accent-glow); }
-        .grid.frozen { pointer-events: none; opacity: 0.4; }
-        .btn { padding: 14px; background: var(--accent); color: var(--bg-deep); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; text-transform: uppercase; width: 100%; margin-top: 10px; }
-        .btn:disabled { opacity: 0.3; }
+
+        #live-clock {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 12px;
+            border-radius: 8px;
+            color: var(--accent);
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 40px;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+        }
+
+        #number-display { font-size: 80px; font-weight: 900; color: var(--text-main); margin: 10px 0; }
+
+        .main-content {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            background: var(--bg-deep);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            width: 100%;
+        }
+
+        .cell {
+            aspect-ratio: 1/1;
+            background: var(--cell-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 8px;
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.05);
+            font-size: 18px;
+        }
+
+        .cell.selected { background: var(--accent); color: var(--bg-deep); }
+
+        .btn {
+            padding: 12px;
+            background: var(--accent);
+            color: var(--bg-deep);
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
         .btn-reset { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+
+        #win-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        #win-overlay.show { display: flex; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-box">
-            <h1 style="color: var(--accent); font-size: 20px; margin-bottom: 20px;">ENTER YOUR NAME</h1>
-            <input type="text" id="player-name-input" placeholder="Type name here...">
-            <button class="btn" onclick="startGame()">ENTER MATRIX</button>
+            <h2 style="color: var(--accent); margin-bottom: 20px;">BINGO LOGIN</h2>
+            <input type="text" id="player-name-input" placeholder="Enter Name">
+            <button class="btn" onclick="startGame()">START GAME</button>
         </div>
     </div>
 
@@ -59,77 +228,45 @@
 
         <div id="live-clock">TIME: 00:00</div>
 
-        <div id="win-overlay">
-            <h2 style="color: var(--success); font-size: 40px; margin:0;">BINGO!</h2>
-            <p id="player-victory-name" style="font-size: 24px; margin: 10px 0;">PLAYER</p>
-            <div id="final-playtime" style="font-style: italic; color: var(--text-dim);">Final Time: 0m 0s</div>
-            <div id="status-msg">Logging results...</div>
-            <div id="cooldown-display" style="color: var(--accent); font-weight: bold; margin-top: 25px; font-size: 20px;"></div>
-        </div>
-
         <div class="sidebar">
-            <h1 style="font-size: 16px; letter-spacing: 2px;">ENGINE</h1>
-            <div id="timer-text">READY FOR DRAW</div>
+            <div id="timer-text" style="font-size: 10px; color: var(--accent);">READY</div>
             <div id="number-display">--</div>
-            <button id="draw-btn" class="btn" onclick="drawNumber()">Draw Number</button>
-            <button id="reset-btn" class="btn btn-reset" onclick="triggerReset()">Reset</button>
-
-            <div class="history-box">
-                <span style="font-size: 10px; color: var(--text-dim); font-weight: bold;">NUMBER LOGS</span>
-                <div id="history">System ready...</div>
-            </div>
+            <button id="draw-btn" class="btn" onclick="drawNumber()">DRAW NUMBER</button>
+            <button class="btn btn-reset" onclick="location.reload()">RESET</button>
         </div>
 
         <div class="main-content">
-            <h3 style="color: var(--text-dim); font-size: 14px; margin-top:0;">PLAYER MATRIX</h3>
             <div id="bingo-card" class="grid"></div>
         </div>
     </div>
 
+    <div id="win-overlay">
+        <h1 style="color: var(--success); font-size: 40px;">BINGO!</h1>
+        <p id="player-victory-name" style="font-size: 20px;"></p>
+        <p id="final-playtime"></p>
+        <button class="btn" style="max-width: 200px;" onclick="location.reload()">PLAY AGAIN</button>
+    </div>
+
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsggGkrXbobuUlSe8i8VI5ojimoJy9Ec_oSD96yq_WX5mCE_qBo1sESFNnTQRdwIo2YQ/exec";
+        let playerName = "", calledNumbers = [], totalSecondsPlayed = 0, stopwatchInterval = null, isLocked = false, gameStarted = false;
 
-        let playerName = "";
-        let calledNumbers = [];
-        let isWaiting = false;
-        let isLocked = false;
-        let stopwatchInterval = null;
-        let totalSecondsPlayed = 0;
-        let gameStarted = false;
-
-        const devToggle = document.getElementById('dev-mode-toggle');
-
-        // PASSWORD PROTECTION LOGIC
-        devToggle.addEventListener('change', function(e) {
+        // Dev Mode Password
+        document.getElementById('dev-mode-toggle').addEventListener('change', function() {
             if (this.checked) {
-                let pw = prompt("Enter Developer Password:");
-                if (pw === "bjo172") {
-                    alert("Developer Mode: Authorized.");
-                } else {
-                    alert("Wrong Password! Access Denied.");
+                if (prompt("Enter Password:") !== "bjo172") {
+                    alert("Wrong Password!");
                     this.checked = false;
                 }
             }
         });
 
         function startGame() {
-            const input = document.getElementById('player-name-input');
-            if (input.value.trim() === "") return alert("Please enter your name!");
-            playerName = input.value.trim();
+            const val = document.getElementById('player-name-input').value.trim();
+            if (!val) return alert("Enter Name!");
+            playerName = val;
             document.getElementById('login-screen').style.display = 'none';
             generateCard();
-        }
-
-        function startTimerLogic() {
-            if (!gameStarted) {
-                gameStarted = true;
-                stopwatchInterval = setInterval(() => {
-                    totalSecondsPlayed++;
-                    let mins = Math.floor(totalSecondsPlayed / 60);
-                    let secs = totalSecondsPlayed % 60;
-                    document.getElementById('live-clock').innerText = `TIME: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                }, 1000);
-            }
         }
 
         function generateCard() {
@@ -144,8 +281,8 @@
                 if (val === "FREE") cell.classList.add('selected');
                 cell.onclick = () => {
                     if (isLocked || val === "FREE") return;
-                    startTimerLogic();
-                    if (devToggle.checked || calledNumbers.includes(Number(val))) {
+                    startTimer();
+                    if (document.getElementById('dev-mode-toggle').checked || calledNumbers.includes(Number(val))) {
                         cell.classList.toggle('selected');
                         checkWin();
                     }
@@ -154,56 +291,39 @@
             }
         }
 
-        function checkWin() {
-            const all = document.querySelectorAll('.cell');
-            const selected = document.querySelectorAll('.cell.selected');
-            if (selected.length === all.length) handleWin();
-        }
-
-        async function handleWin() {
-            isLocked = true;
-            clearInterval(stopwatchInterval);
-            const timeStr = document.getElementById('live-clock').innerText.replace('TIME: ', '');
-            document.getElementById('player-victory-name').innerText = playerName.toUpperCase();
-            document.getElementById('final-playtime').innerText = `Final Playtime: ${timeStr}`;
-            document.getElementById('win-overlay').classList.add('show');
-
-            try {
-                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: playerName, playtime: timeStr, seconds: totalSecondsPlayed }) });
-                document.getElementById('status-msg').innerText = "Data synced successfully.";
-            } catch (e) {
-                document.getElementById('status-msg').innerText = "Sync Error.";
+        function startTimer() {
+            if (!gameStarted) {
+                gameStarted = true;
+                stopwatchInterval = setInterval(() => {
+                    totalSecondsPlayed++;
+                    let m = Math.floor(totalSecondsPlayed / 60), s = totalSecondsPlayed % 60;
+                    document.getElementById('live-clock').innerText = `TIME: ${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                }, 1000);
             }
-            startCooldown(600);
         }
 
         function drawNumber() {
-            if (isWaiting || isLocked) return;
-            startTimerLogic();
-            let num;
-            do { num = Math.floor(Math.random() * 75) + 1; } while (calledNumbers.includes(num));
-            calledNumbers.push(num);
-            document.getElementById('number-display').innerText = num;
-            document.getElementById('history').innerText = calledNumbers.slice().reverse().join(', ');
-            isWaiting = true;
+            if (isLocked) return;
+            startTimer();
+            let n; do { n = Math.floor(Math.random()*75)+1; } while(calledNumbers.includes(n));
+            calledNumbers.push(n);
+            document.getElementById('number-display').innerText = n;
+
             document.getElementById('draw-btn').disabled = true;
-            let count = 3;
-            let drawTimer = setInterval(() => {
-                count--;
-                if (count <= 0) { clearInterval(drawTimer); isWaiting = false; document.getElementById('draw-btn').disabled = false; document.getElementById('timer-text').innerText = "READY"; }
-                else { document.getElementById('timer-text').innerText = `LOCKED (${count}S)`; }
-            }, 1000);
+            setTimeout(() => document.getElementById('draw-btn').disabled = false, 3000);
         }
 
-        function triggerReset() { if (!isLocked && confirm("Reset Game?")) location.reload(); }
+        function checkWin() {
+            if (document.querySelectorAll('.cell.selected').length === 25) {
+                isLocked = true;
+                clearInterval(stopwatchInterval);
+                const timeStr = document.getElementById('live-clock').innerText.replace('TIME: ', '');
+                document.getElementById('player-victory-name').innerText = playerName;
+                document.getElementById('final-playtime').innerText = "Time: " + timeStr;
+                document.getElementById('win-overlay').classList.add('show');
 
-        function startCooldown(s) {
-            let timeLeft = s;
-            setInterval(() => {
-                let m = Math.floor(timeLeft / 60); let sc = timeLeft % 60;
-                document.getElementById('cooldown-display').innerText = `Reset in: ${m}m ${sc}s`;
-                if (timeLeft-- < 0) location.reload();
-            }, 1000);
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: playerName, playtime: timeStr, seconds: totalSecondsPlayed })});
+            }
         }
     </script>
 </body>
