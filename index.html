@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo Pro - Compact Mobile</title>
+    <title>Bingo Pro - Responsive</title>
     <style>
         :root {
             --bg-deep: #0f172a;
@@ -13,20 +13,12 @@
             --text-dim: #94a3b8;
             --cell-bg: #334155;
             --danger: #f43f5e;
+            --success: #22c55e;
         }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg-deep); 
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-deep); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
 
-        /* Login Screen - Aro choto kora hoyeche */
+        /* Login Screen */
         #login-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -35,7 +27,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 15px; /* Side padding jeno frame-e na badhe */
+            padding: 15px;
         }
 
         .login-box {
@@ -45,14 +37,7 @@
             border: 1px solid var(--accent);
             text-align: center;
             width: 100%;
-            max-width: 280px; /* Width aro komiye deya hoyeche */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-
-        .login-box h2 {
-            font-size: 18px;
-            margin-top: 0;
-            color: var(--accent);
+            max-width: 280px;
         }
 
         .login-box input {
@@ -63,98 +48,58 @@
             border-radius: 8px;
             margin-bottom: 15px;
             width: 100%;
-            box-sizing: border-box; /* Ete padding width-er bhitore thake */
+            box-sizing: border-box;
             outline: none;
-            font-size: 14px;
         }
+
+        /* Win Overlay */
+        #win-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            z-index: 2000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #win-overlay.show { display: flex; }
 
         .dashboard {
             display: flex;
-            flex-direction: column; /* Mobile first vertically stack */
+            flex-direction: column;
             background: var(--bg-card);
             border-radius: 20px;
             width: 92%;
             max-width: 400px;
-            margin: 10px auto;
-            overflow: hidden;
             border: 1px solid rgba(255,255,255,0.1);
             position: relative;
         }
 
-        /* Desktop layout jodi screen boro hoy */
-        @media (min-width: 769px) {
-            .dashboard { flex-direction: row; max-width: 900px; }
-            .sidebar { border-right: 1px solid rgba(255,255,255,0.1); }
-        }
+        .dev-container { position: absolute; top: 10px; left: 10px; z-index: 20; display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 15px; }
 
-        .dev-container {
-            position: absolute;
-            top: 10px; left: 10px;
-            z-index: 20;
-            background: rgba(0,0,0,0.4);
-            padding: 4px 8px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        #live-clock { position: absolute; top: 10px; right: 10px; color: var(--accent); font-size: 14px; font-family: monospace; font-weight: bold; }
 
-        #live-clock { 
-            position: absolute; 
-            top: 10px; right: 10px; 
-            background: rgba(0,0,0,0.4); 
-            padding: 5px 10px; 
-            border-radius: 6px; 
-            color: var(--accent); 
-            font-size: 12px;
-            font-family: monospace;
-        }
+        .sidebar { padding: 35px 20px 10px; text-align: center; }
 
-        .sidebar { 
-            padding: 30px 20px 15px; 
-            text-align: center;
-            background: rgba(15, 23, 42, 0.3);
-        }
+        #number-display { font-size: 55px; font-weight: 800; margin: 5px 0; color: white; }
 
-        #number-display { font-size: 50px; font-weight: 800; margin: 10px 0; }
-        
-        .main-content { padding: 15px; background: var(--bg-deep); }
+        .main-content { padding: 15px; background: var(--bg-deep); border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
 
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(5, 1fr); 
-            gap: 6px; 
-        }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 
-        .cell { 
-            aspect-ratio: 1/1;
-            background: var(--cell-bg); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: 700; 
-            border-radius: 6px; 
-            font-size: 14px;
-            user-select: none;
-        }
+        .cell { aspect-ratio: 1/1; background: var(--cell-bg); display: flex; align-items: center; justify-content: center; font-weight: 700; border-radius: 6px; font-size: 14px; }
 
-        .cell.selected { background: var(--accent); color: var(--bg-deep); }
+        .cell.selected { background: var(--accent); color: var(--bg-deep); box-shadow: 0 0 10px var(--accent); }
 
-        .btn { 
-            padding: 10px; 
-            background: var(--accent); 
-            color: var(--bg-deep); 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: 700; 
-            width: 100%; 
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
+        .btn { padding: 12px; background: var(--accent); color: var(--bg-deep); border: none; border-radius: 8px; font-weight: 700; width: 100%; margin-bottom: 8px; cursor: pointer; text-transform: uppercase; }
 
-        .btn-reset { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+        .btn-reset { background: transparent; color: var(--danger); border: 1px solid var(--danger); font-size: 11px; }
 
-        /* Dev Switch */
+        /* Switch */
         .switch { position: relative; display: inline-block; width: 30px; height: 16px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #475569; border-radius: 34px; transition: .3s; }
@@ -168,9 +113,17 @@
     <div id="login-screen">
         <div class="login-box">
             <h2>BINGO JOIN</h2>
-            <input type="text" id="player-name-input" placeholder="Your Name" maxlength="15">
+            <input type="text" id="player-name-input" placeholder="Your Name">
             <button class="btn" onclick="startGame()">ENTER GAME</button>
         </div>
+    </div>
+
+    <div id="win-overlay">
+        <h1 style="color: var(--success); font-size: 35px; margin-bottom: 5px;">CONGRATULATIONS!</h1>
+        <h2 id="win-player-name" style="color: white; margin: 0;">PLAYER</h2>
+        <p style="color: var(--text-dim); margin-top: 10px;">You hit BINGO!</p>
+        <div id="win-time" style="font-size: 20px; color: var(--accent); font-family: monospace; margin: 15px 0;">Time: 00:00</div>
+        <button class="btn" style="max-width: 200px;" onclick="location.reload()">PLAY AGAIN</button>
     </div>
 
     <div class="dashboard">
@@ -186,8 +139,8 @@
 
         <div class="sidebar">
             <div id="number-display">--</div>
-            <button id="draw-btn" class="btn" onclick="drawNumber()">DRAW</button>
-            <button class="btn btn-reset" style="font-size: 11px;" onclick="location.reload()">RESET</button>
+            <button id="draw-btn" class="btn" onclick="drawNumber()">DRAW NUMBER</button>
+            <button class="btn btn-reset" onclick="location.reload()">RESET</button>
         </div>
 
         <div class="main-content">
@@ -207,7 +160,7 @@
 
         function startGame() {
             const val = document.getElementById('player-name-input').value.trim();
-            if (!val) return;
+            if (!val) return alert("Enter Name!");
             playerName = val;
             document.getElementById('login-screen').style.display = 'none';
             generateCard();
@@ -249,6 +202,7 @@
         function drawNumber() {
             if (isLocked) return;
             startTimer();
+            if (calledNumbers.length >= 75) return;
             let n; do { n = Math.floor(Math.random()*75)+1; } while(calledNumbers.includes(n));
             calledNumbers.push(n);
             document.getElementById('number-display').innerText = n;
@@ -257,9 +211,21 @@
         }
 
         function win() {
-            isLocked = true; clearInterval(stopwatchInterval);
-            alert("BINGO! Syncing data...");
-            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: playerName, playtime: document.getElementById('live-clock').innerText, seconds: totalSecondsPlayed })});
+            isLocked = true;
+            clearInterval(stopwatchInterval);
+            const finalTime = document.getElementById('live-clock').innerText;
+
+            // Show Win Note
+            document.getElementById('win-player-name').innerText = playerName.toUpperCase();
+            document.getElementById('win-time').innerText = "Final Time: " + finalTime;
+            document.getElementById('win-overlay').classList.add('show');
+
+            // Sync to Sheet
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ name: playerName, playtime: finalTime, seconds: totalSecondsPlayed })
+            });
         }
     </script>
 </body>
