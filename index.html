@@ -3,26 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo Pro - No Delay Edition</title>
+    <title>Bingo Pro - Grand Mobile RP</title>
     <style>
         :root {
             --bg-deep: #0f172a;
-            --bg-card: #1e293b;
+            --bg-card: rgba(30, 41, 59, 0.9);
             --accent: #38bdf8;
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
-            --cell-bg: #334155;
+            --cell-bg: rgba(51, 65, 85, 0.8);
             --danger: #f43f5e;
             --success: #22c55e;
+            --gold: #ffb400;
         }
 
-        body { font-family: 'Inter', sans-serif; background: var(--bg-deep); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            background: url('https://i.postimg.cc/FzNgjBHW/Screenshot-(129).png') no-repeat center center fixed;
+            background-size: cover;
+        }
 
-        /* Login Screen */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            z-index: -1;
+        }
+
+        /* Login Screen Overlay */
         #login-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-deep);
+            background: rgba(15, 23, 42, 0.95);
             z-index: 1000;
             display: flex;
             justify-content: center;
@@ -38,14 +57,13 @@
             text-align: center;
             width: 100%;
             max-width: 280px;
+            backdrop-filter: blur(10px);
         }
 
-        .name-format-note { color: var(--danger); font-size: 11px; font-weight: bold; margin-bottom: 15px; display: block; }
-
         .login-box input {
-            background: var(--bg-deep);
+            background: rgba(15, 23, 42, 0.8);
             border: 1px solid #475569;
-            padding: 10px;
+            padding: 12px;
             color: white;
             border-radius: 8px;
             margin-bottom: 15px;
@@ -54,23 +72,9 @@
             outline: none;
         }
 
-        /* Win Overlay */
-        #win-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.98);
-            z-index: 2000;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-        #win-overlay.show { display: flex; }
-
+        /* Dashboard (Initially Hidden) */
         .dashboard {
-            display: flex;
+            display: none;
             flex-direction: column;
             background: var(--bg-card);
             border-radius: 20px;
@@ -79,69 +83,75 @@
             border: 1px solid rgba(255,255,255,0.1);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
 
-        .dev-container { position: absolute; top: 10px; left: 10px; z-index: 20; display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 15px; }
-        #live-clock { position: absolute; top: 10px; right: 10px; color: var(--accent); font-size: 14px; font-family: monospace; font-weight: bold; }
+        /* Brand & Clock */
+        .brand-header { position: absolute; top: 12px; left: 15px; z-index: 30; }
+        .brand-name { font-size: 13px; font-weight: 900; text-transform: uppercase; color: var(--gold); letter-spacing: 1px; }
+        .dev-container { position: absolute; top: 12px; right: 80px; z-index: 20; display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 15px; }
+        #live-clock { position: absolute; top: 15px; right: 15px; color: var(--accent); font-size: 14px; font-family: monospace; font-weight: bold; }
 
-        .sidebar { padding: 35px 20px 10px; text-align: center; }
-        #number-display { font-size: 55px; font-weight: 800; margin: 5px 0; color: white; }
+        .sidebar { padding: 45px 20px 10px; text-align: center; }
+        #number-display { font-size: 65px; font-weight: 800; margin: 5px 0; color: white; text-shadow: 0 0 15px var(--accent); }
 
-        .called-list-container {
-            background: rgba(0,0,0,0.2);
-            padding: 10px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            text-align: left;
-        }
-        .called-list-title { font-size: 10px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 5px; display: block; }
-        #called-numbers-history {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            white-space: nowrap;
-            padding-bottom: 5px;
-            scrollbar-width: thin;
-        }
-        .history-item {
+        .called-list-container { background: rgba(0,0,0,0.3); padding: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
+        #called-numbers-history { display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; padding-bottom: 5px; scrollbar-width: none; }
+        .history-item { background: var(--accent); padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; color: var(--bg-deep); }
+
+        .main-content { padding: 15px; background: rgba(15, 23, 42, 0.6); }
+
+        /* Grid */
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .cell {
+            aspect-ratio: 1/1;
             background: var(--cell-bg);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 13px;
-            font-weight: bold;
-            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.1);
         }
+        .cell.selected { background: var(--accent); color: var(--bg-deep); box-shadow: 0 0 15px var(--accent); border-color: white; }
 
-        .main-content { padding: 15px; background: var(--bg-deep); }
+        /* Buttons */
+        .btn { padding: 14px; background: var(--accent); color: var(--bg-deep); border: none; border-radius: 10px; font-weight: 700; width: 100%; margin-bottom: 8px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 0 #0284c7; }
+        .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #0284c7; }
+        .btn-reset { background: transparent; color: var(--danger); border: 1px solid var(--danger); font-size: 11px; margin-top: 5px; box-shadow: none; }
 
-        /* 4x4 Grid */
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .cell { aspect-ratio: 1/1; background: var(--cell-bg); display: flex; align-items: center; justify-content: center; font-weight: 700; border-radius: 6px; font-size: 16px; cursor: pointer; }
-        .cell.selected { background: var(--accent); color: var(--bg-deep); box-shadow: 0 0 10px var(--accent); }
+        /* WIN OVERLAY (FIXED DESIGN) */
+        #win-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            z-index: 2000;
+            flex-direction: column; /* Fixed: Elements now stack vertically */
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        #win-overlay h1 { color: var(--success); font-size: 48px; margin: 10px 0; }
+        #win-player-name { color: white; font-size: 24px; text-transform: uppercase; margin-bottom: 5px; }
+        #win-time { font-size: 20px; color: var(--accent); font-family: monospace; margin-bottom: 15px; }
+        #cooldown-text { color: var(--danger); font-weight: bold; font-size: 18px; margin-bottom: 20px; }
 
-        .btn { padding: 12px; background: var(--accent); color: var(--bg-deep); border: none; border-radius: 8px; font-weight: 700; width: 100%; margin-bottom: 8px; cursor: pointer; text-transform: uppercase; }
-        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .btn-reset { background: transparent; color: var(--danger); border: 1px solid var(--danger); font-size: 11px; }
-
-        /* Confirmation Dialog Overlay */
         #confirm-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.95);
             z-index: 3000;
             justify-content: center;
             align-items: center;
         }
-        .confirm-box {
-            background: var(--bg-card);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid var(--danger);
-            text-align: center;
-            max-width: 250px;
-        }
-
-        #cooldown-text { color: var(--danger); font-weight: bold; margin-top: 15px; font-size: 18px; }
+        .confirm-box { background: var(--bg-card); padding: 25px; border-radius: 16px; text-align: center; border: 1px solid var(--danger); }
 
         .switch { position: relative; display: inline-block; width: 30px; height: 16px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -155,80 +165,60 @@
 
     <div id="login-screen">
         <div class="login-box">
-            <h2>BINGO JOIN</h2>
-            <span class="name-format-note">Name format : Nick Wildee</span>
-            <input type="text" id="player-name-input" placeholder="Your Name">
-            <button class="btn" onclick="startGame()">ENTER GAME</button>
+            <h2 style="margin: 0 0 15px 0; color: var(--gold);">GRAND MOBILE RP</h2>
+            <input type="text" id="player-name-input" placeholder="Enter Your Name">
+            <button class="btn" onclick="startGame()">ENTER BINGO</button>
         </div>
     </div>
 
     <div id="confirm-overlay">
         <div class="confirm-box">
-            <h3 style="margin-top: 0;">Reset Game?</h3>
-            <p style="color: var(--text-dim); font-size: 14px;">All progress will be lost.</p>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn" onclick="location.reload()" style="background: var(--danger); color: white;">YES</button>
-                <button class="btn" onclick="toggleConfirm(false)" style="background: var(--cell-bg); color: white;">NO</button>
-            </div>
+            <h3>RESET GAME?</h3>
+            <button class="btn" onclick="location.reload()" style="background: var(--danger); color: white;">YES, RESET</button>
+            <button class="btn" onclick="toggleConfirm(false)" style="background: var(--cell-bg); color: white; margin-top: 10px; box-shadow: none;">CANCEL</button>
         </div>
     </div>
 
     <div id="win-overlay">
-        <h1 style="color: var(--success); font-size: 35px; margin-bottom: 5px;">CONGRATULATIONS!</h1>
-        <h2 id="win-player-name" style="color: white; margin: 0;">PLAYER</h2>
-        <div id="win-time" style="font-size: 20px; color: var(--accent); font-family: monospace; margin: 15px 0;">Time: 00:00</div>
+        <h1>BINGO WIN!</h1>
+        <h2 id="win-player-name">PLAYER</h2>
+        <div id="win-time">Time: 00:00</div>
         <div id="cooldown-text">Wait: 10:00</div>
-        <button id="play-again-btn" class="btn" style="max-width: 200px; margin-top: 15px;" onclick="location.reload()" disabled>PLAY AGAIN</button>
+        <button id="play-again-btn" class="btn" style="max-width: 250px;" onclick="location.reload()" disabled>PLAY AGAIN</button>
     </div>
 
-    <div class="dashboard">
+    <div class="dashboard" id="main-dashboard">
+        <div class="brand-header"><span class="brand-name">Grand Mobile RP</span></div>
         <div class="dev-container">
             <span style="font-size: 9px; color: var(--text-dim);">DEV</span>
-            <label class="switch">
-                <input type="checkbox" id="dev-mode-toggle">
-                <span class="slider"></span>
-            </label>
+            <label class="switch"><input type="checkbox" id="dev-mode-toggle"><span class="slider"></span></label>
         </div>
-
         <div id="live-clock">00:00</div>
-
         <div class="sidebar">
             <div id="number-display">--</div>
-            <button id="draw-btn" class="btn" onclick="drawNumber()">DRAW NUMBER</button>
+            <button class="btn" onclick="drawNumber()">DRAW NUMBER</button>
             <button class="btn btn-reset" onclick="toggleConfirm(true)">RESET</button>
         </div>
-
-        <div class="called-list-container">
-            <span class="called-list-title">Called Numbers:</span>
-            <div id="called-numbers-history">
-                <span style="color: #475569; font-size: 12px;">No numbers called yet</span>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <div id="bingo-card" class="grid"></div>
-        </div>
+        <div class="called-list-container"><div id="called-numbers-history"></div></div>
+        <div class="main-content"><div id="bingo-card" class="grid"></div></div>
     </div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsggGkrXbobuUlSe8i8VI5ojimoJy9Ec_oSD96yq_WX5mCE_qBo1sESFNnTQRdwIo2YQ/exec";
         let playerName = "", calledNumbers = [], totalSecondsPlayed = 0, stopwatchInterval = null, isLocked = false, gameStarted = false;
 
-        document.getElementById('dev-mode-toggle').addEventListener('change', function() {
-            if (this.checked && prompt("Password:") !== "bjo172") {
-                alert("Denied!"); this.checked = false;
-            }
-        });
+        function toggleConfirm(show) { document.getElementById('confirm-overlay').style.display = show ? 'flex' : 'none'; }
 
-        function toggleConfirm(show) {
-            document.getElementById('confirm-overlay').style.display = show ? 'flex' : 'none';
-        }
+        document.getElementById('dev-mode-toggle').addEventListener('change', function() {
+            if (this.checked && prompt("Password:") !== "bjo172") { alert("Denied!"); this.checked = false; }
+        });
 
         function startGame() {
             const val = document.getElementById('player-name-input').value.trim();
-            if (!val) return alert("Enter Name!");
+            if (!val) return alert("Please enter your name!");
             playerName = val;
             document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-dashboard').style.display = 'flex';
             generateCard();
         }
 
@@ -239,12 +229,11 @@
             for (let i = 0; i < 16; i++) {
                 let cell = document.createElement('div');
                 cell.className = 'cell';
-                let val = nums[i];
-                cell.innerText = val;
+                cell.innerText = nums[i];
                 cell.onclick = () => {
                     if (isLocked) return;
-                    startTimer();
-                    if (document.getElementById('dev-mode-toggle').checked || calledNumbers.includes(Number(val))) {
+                    if (!gameStarted) startTimer();
+                    if (document.getElementById('dev-mode-toggle').checked || calledNumbers.includes(Number(cell.innerText))) {
                         cell.classList.toggle('selected');
                         if (document.querySelectorAll('.cell.selected').length === 16) win();
                     }
@@ -254,23 +243,19 @@
         }
 
         function startTimer() {
-            if (!gameStarted) {
-                gameStarted = true;
-                stopwatchInterval = setInterval(() => {
-                    totalSecondsPlayed++;
-                    let m = Math.floor(totalSecondsPlayed/60), s = totalSecondsPlayed%60;
-                    document.getElementById('live-clock').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                }, 1000);
-            }
+            gameStarted = true;
+            stopwatchInterval = setInterval(() => {
+                totalSecondsPlayed++;
+                let m = Math.floor(totalSecondsPlayed/60), s = totalSecondsPlayed%60;
+                document.getElementById('live-clock').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            }, 1000);
         }
 
         function drawNumber() {
-            if (isLocked) return;
-            startTimer();
-            if (calledNumbers.length >= 60) return;
+            if (isLocked || calledNumbers.length >= 60) return;
+            if (!gameStarted) startTimer();
             let n; do { n = Math.floor(Math.random()*60)+1; } while(calledNumbers.includes(n));
             calledNumbers.push(n);
-
             document.getElementById('number-display').innerText = n;
             updateHistoryUI();
         }
@@ -286,28 +271,22 @@
             });
         }
 
-        function startCooldown() {
-            let timeLeft = 600;
-            const timer = setInterval(() => {
-                let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-                document.getElementById('cooldown-text').innerText = `Wait: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    document.getElementById('cooldown-text').innerText = "System Ready!";
-                    document.getElementById('play-again-btn').disabled = false;
-                }
-                timeLeft--;
-            }, 1000);
-        }
-
         function win() {
             isLocked = true;
             clearInterval(stopwatchInterval);
             const finalTime = document.getElementById('live-clock').innerText;
-            document.getElementById('win-player-name').innerText = playerName.toUpperCase();
-            document.getElementById('win-time').innerText = "Final Time: " + finalTime;
-            document.getElementById('win-overlay').classList.add('show');
-            startCooldown();
+            document.getElementById('win-player-name').innerText = playerName;
+            document.getElementById('win-time').innerText = "Total Time: " + finalTime;
+            document.getElementById('win-overlay').style.display = 'flex';
+
+            let timeLeft = 600;
+            const timer = setInterval(() => {
+                let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+                document.getElementById('cooldown-text').innerText = `Cooldown: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                if (timeLeft <= 0) { clearInterval(timer); document.getElementById('play-again-btn').disabled = false; }
+                timeLeft--;
+            }, 1000);
+
             fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: playerName, playtime: finalTime, seconds: totalSecondsPlayed }) });
         }
     </script>
